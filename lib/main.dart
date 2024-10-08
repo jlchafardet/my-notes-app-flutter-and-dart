@@ -20,14 +20,20 @@ class NotesScreen extends StatefulWidget {
 }
 
 class _NotesScreenState extends State<NotesScreen> {
-  final List<String> _notes = []; // List to store notes
-  final TextEditingController _controller = TextEditingController();
+  final List<Map<String, String>> _notes = []; // List to store notes as maps
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
 
   void _addNote() {
-    if (_controller.text.isNotEmpty) {
+    if (_titleController.text.isNotEmpty &&
+        _contentController.text.isNotEmpty) {
       setState(() {
-        _notes.add(_controller.text); // Add note to the list
-        _controller.clear(); // Clear the input field
+        _notes.add({
+          'title': _titleController.text,
+          'content': _contentController.text,
+        }); // Add note to the list
+        _titleController.clear(); // Clear the title input field
+        _contentController.clear(); // Clear the content input field
       });
     }
   }
@@ -49,22 +55,32 @@ class _NotesScreenState extends State<NotesScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              controller: _controller,
+              controller: _titleController,
               decoration: InputDecoration(
-                labelText: 'Enter a note',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: _addNote, // Add note when button is pressed
-                ),
+                labelText: 'Enter note title',
               ),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _contentController,
+              decoration: InputDecoration(
+                labelText: 'Enter note content',
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: _addNote, // Add note when button is pressed
+            child: Text('Add Note'),
           ),
           Expanded(
             child: ListView.builder(
               itemCount: _notes.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(_notes[index]),
+                  title: Text(_notes[index]['title']!),
+                  subtitle: Text(_notes[index]['content']!),
                   trailing: IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: () => _deleteNote(
