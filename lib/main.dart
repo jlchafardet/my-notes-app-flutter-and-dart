@@ -1,3 +1,14 @@
+// ============================================================================
+// Author: José Luis Chafardet G.
+// Email: jose.chafardet@icloud.com
+// Github: https://github.com/jlchafardet
+//
+// File Name: main.dart
+// Description: A simple notes application that allows users to add, view, and edit notes.
+// Created: 2023-10-04
+// Last Modified: 2023-10-05
+// ============================================================================
+
 import 'package:flutter/material.dart';
 
 void main() {
