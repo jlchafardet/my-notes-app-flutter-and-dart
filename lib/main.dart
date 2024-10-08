@@ -5,9 +5,12 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key); // Added key parameter
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
+      // Added 'const' here
       title: 'My Notes App',
       home: NotesScreen(),
     );
@@ -15,11 +18,13 @@ class MyApp extends StatelessWidget {
 }
 
 class NotesScreen extends StatefulWidget {
+  const NotesScreen({Key? key}) : super(key: key); // Added key parameter
+
   @override
-  _NotesScreenState createState() => _NotesScreenState();
+  NotesScreenState createState() => NotesScreenState();
 }
 
-class _NotesScreenState extends State<NotesScreen> {
+class NotesScreenState extends State<NotesScreen> {
   final List<Map<String, String>> _notes = []; // List to store notes as maps
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
@@ -38,17 +43,11 @@ class _NotesScreenState extends State<NotesScreen> {
     }
   }
 
-  void _deleteNote(int index) {
-    setState(() {
-      _notes.removeAt(index); // Remove note from the list
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Notes'),
+        title: const Text('My Notes'), // Added 'const' here
       ),
       body: Column(
         children: [
@@ -56,7 +55,8 @@ class _NotesScreenState extends State<NotesScreen> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _titleController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
+                // Added 'const' here
                 labelText: 'Enter note title',
               ),
             ),
@@ -65,27 +65,24 @@ class _NotesScreenState extends State<NotesScreen> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _contentController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
+                // Added 'const' here
                 labelText: 'Enter note content',
               ),
             ),
           ),
           ElevatedButton(
             onPressed: _addNote, // Add note when button is pressed
-            child: Text('Add Note'),
+            child: const Text('Add Note'), // Added 'const' here
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: _notes.length,
+              itemCount: _notes.length, // Display the number of notes
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(_notes[index]['title']!),
-                  subtitle: Text(_notes[index]['content']!),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () => _deleteNote(
-                        index), // Delete note when button is pressed
-                  ),
+                  title: Text(_notes[index]['title']!), // Display note title
+                  subtitle:
+                      Text(_notes[index]['content']!), // Display note content
                 );
               },
             ),

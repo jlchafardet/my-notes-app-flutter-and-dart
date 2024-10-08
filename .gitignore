@@ -4,6 +4,8 @@
 workflow.json
 teaching_plan.md
 app_tutorial_outline.md
+tutorial/
+the_idea.txt
 
 # Miscellaneous
 *.class
