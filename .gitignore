@@ -2,6 +2,8 @@
 .DS_Store
 .Trash/
 workflow.json
+teaching_plan.md
+app_tutorial_outline.md
 
 # Miscellaneous
 *.class
