@@ -31,6 +31,27 @@
 
   <title>my_notes_app</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-analytics.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_TUt6VkF3X8Da0mW_OhXieD8YhoCktkY",
+      authDomain: "mynotesapp-jlch-flutter.firebaseapp.com",
+      projectId: "mynotesapp-jlch-flutter",
+      storageBucket: "mynotesapp-jlch-flutter.appspot.com",
+      messagingSenderId: "795559777376",
+      appId: "1:795559777376:web:279e3fd30bfb16ed3e5f05",
+      measurementId: "G-GG546T0NWW"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    // const analytics = getAnalytics(app);
+  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

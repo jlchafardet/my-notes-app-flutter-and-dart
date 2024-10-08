@@ -10,8 +10,21 @@
 // ============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: "AIzaSyD_TUt6VkF3X8Da0mW_OhXieD8YhoCktkY",
+      authDomain: "mynotesapp-jlch-flutter.firebaseapp.com",
+      projectId: "mynotesapp-jlch-flutter",
+      storageBucket: "mynotesapp-jlch-flutter.appspot.com",
+      messagingSenderId: "795559777376",
+      appId: "1:795559777376:web:279e3fd30bfb16ed3e5f05",
+      measurementId: "G-GG546T0NWW",
+    ),
+  );
   runApp(MyApp());
 }
 
