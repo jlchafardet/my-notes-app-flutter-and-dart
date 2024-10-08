@@ -53,11 +53,14 @@ class NotesScreenState extends State<NotesScreen> {
       setState(() {
         _notes[index] = note; // Update the note at the specified index
       });
+      print(
+          '${note['title']} note was modified'); // Log when a note is modified
     } else {
       // Add new note
       setState(() {
         _notes.add(note); // Add note to the list
       });
+      print('New note added: ${note['title']}'); // Log when a new note is added
     }
   }
 
@@ -76,6 +79,16 @@ class NotesScreenState extends State<NotesScreen> {
     if (updatedNote != null) {
       _addOrEditNote(updatedNote, index); // Update the note if not null
     }
+  }
+
+  // Method to delete a note
+  void _deleteNote(int index) {
+    final deletedNoteTitle =
+        _notes[index]['title']; // Get the title of the note being deleted
+    setState(() {
+      _notes.removeAt(index); // Remove the note at the specified index
+    });
+    print('$deletedNoteTitle was deleted'); // Log when a note is deleted
   }
 
   @override
@@ -119,6 +132,19 @@ class NotesScreenState extends State<NotesScreen> {
               return ListTile(
                 title: Text(_notes[index]['title']!), // Display note title
                 onTap: () => _editNote(index), // Edit note on tap
+                trailing: Ink(
+                  decoration: const ShapeDecoration(
+                    color: Colors.red, // Background color for the delete button
+                    shape: CircleBorder(),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.delete,
+                        color: Colors.white), // Set icon color to white
+                    onPressed: () {
+                      _deleteNote(index); // Call delete method on press
+                    },
+                  ),
+                ),
               );
             },
           ),
@@ -133,8 +159,8 @@ class AddNoteScreen extends StatelessWidget {
       {Key? key, this.title, this.content, this.isEditing = false})
       : super(key: key);
 
-  final String? title;
-  final String? content;
+  final String? title; // Title of the note (for editing)
+  final String? content; // Content of the note (for editing)
   final bool isEditing; // Flag to indicate if we are editing
 
   @override
@@ -147,7 +173,7 @@ class AddNoteScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            isEditing ? 'View Note' : 'Add Note'), // Change title based on mode
+            isEditing ? 'Edit Note' : 'Add Note'), // Change title based on mode
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -156,16 +182,16 @@ class AddNoteScreen extends StatelessWidget {
             TextField(
               controller: _titleController,
               decoration: const InputDecoration(
-                labelText: 'Title', // Only show "Title" in view mode
+                labelText: 'Title', // Label for the title field
               ),
-              readOnly: isEditing, // Make it read-only if in edit mode
+              readOnly: false, // Allow editing of the title
             ),
             TextField(
               controller: _contentController,
               decoration: const InputDecoration(
-                labelText: 'Content', // Only show "Content" in view mode
+                labelText: 'Content', // Label for the content field
               ),
-              readOnly: isEditing, // Make it read-only if in edit mode
+              readOnly: false, // Allow editing of the content
             ),
             ElevatedButton(
               onPressed: () {
