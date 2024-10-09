@@ -27,6 +27,8 @@ void main() async {
       measurementId: "G-GG546T0NWW",
     ),
   );
+  await FirebaseFirestore.instance
+      .enablePersistence(); // Enable offline persistence
   runApp(MyApp());
 }
 
