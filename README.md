@@ -15,6 +15,14 @@ A Flutter application for managing notes.
 3. **Add Functionality to Edit Existing Notes**:
    - Users can tap on a note to edit its title and content, making it easy to update information as needed.
 
+### Step 2: Data Persistence with Firebase Firestore
+
+1. **Set Up Firebase**:
+   - The app is integrated with Firebase Firestore for data persistence, allowing users to save, retrieve, edit, and delete notes in real-time.
+
+2. **CRUD Operations**:
+   - Users can create new notes, read existing notes, update notes, and delete notes, all of which are reflected in Firestore.
+
 ## Getting Started
 
 To run this project, you need to have Flutter installed on your machine. Follow the instructions below to get started.
@@ -23,6 +31,7 @@ To run this project, you need to have Flutter installed on your machine. Follow 
 
 - Flutter SDK
 - Dart SDK
+- Firebase account (for Firestore)
 
 ### Installation
 
@@ -41,6 +50,10 @@ To run this project, you need to have Flutter installed on your machine. Follow 
    flutter pub get
    ```
 
+4. **Set Up Firebase**:
+   - Follow the instructions in the [Firebase Console](https://console.firebase.google.com/) to create a new project and enable Firestore.
+   - Add the Firebase configuration to the `web/index.html` file as described in the tutorial.
+
 ### Running the App
 
 To run the app, use the following command:
@@ -55,7 +68,7 @@ For more information on Flutter development, check out the official documentatio
 
 ## Contributing
 
-If you would like to contribute to this project, please fork the repository and submit a pull request.
+If you would like to contribute to this project, please fork the repository and submit a pull request. Ensure that any changes related to Firebase are well-documented.
 
 ## License
 
