@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'note_model.dart'; // Import the Note model
+import 'add_note_type_screen.dart'; // Import the AddNoteTypeScreen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -147,7 +148,19 @@ class NotesScreenState extends State<NotesScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // List existing note types and provide options to add/edit/delete
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddNoteTypeScreen(),
+                    ),
+                  ); // Navigate to AddNoteTypeScreen
+                },
+                child: const Text('Add New Note Type'),
+              ),
+              // Additional options for editing/deleting note types can be added here
             ],
           ),
           actions: [
