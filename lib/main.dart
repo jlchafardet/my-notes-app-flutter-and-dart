@@ -14,6 +14,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'note_model.dart'; // Import the Note model
 import 'add_note_type_screen.dart'; // Import the AddNoteTypeScreen
+import 'note_type_model.dart'; // Import the NoteType model
+import 'add_note_screen.dart'; // Import the AddNoteScreen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,11 +62,13 @@ class NotesScreenState extends State<NotesScreen> {
     'To-Do',
     'Shopping List'
   ]; // Example note types
+  List<NoteType> _noteTypes = []; // List to store fetched note types
 
   @override
   void initState() {
     super.initState();
     _fetchNotes(); // Fetch notes from Firestore when the screen is initialized
+    _fetchNoteTypes(); // Fetch note types from Firestore
   }
 
   // Method to fetch notes from Firestore
@@ -112,6 +116,9 @@ class NotesScreenState extends State<NotesScreen> {
           content: existingNote.content,
           id: existingNote.id, // Pass the ID for editing
           isEditing: true, // Indicate that we are editing
+          selectedNoteType:
+              existingNote.noteType, // Pass the existing note type
+          noteTypes: _noteTypes, // Pass the fetched note types
         ),
       ),
     );
@@ -174,6 +181,28 @@ class NotesScreenState extends State<NotesScreen> {
     );
   }
 
+  void _fetchNoteTypes() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('noteTypes')
+          .get(); // Ensure this matches the Firestore collection name
+      final noteTypes = snapshot.docs.map((doc) {
+        return NoteType.fromMap(
+            doc.data()..['id'] = doc.id); // Include the document ID
+      }).toList();
+
+      setState(() {
+        _noteTypes = noteTypes; // Store the fetched note types
+      });
+
+      // Debug output to confirm note types are fetched
+      print(
+          'Fetched note types: ${_noteTypes.map((type) => type.name).toList()}');
+    } catch (e) {
+      print('Error fetching note types: $e'); // Log any errors
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -200,7 +229,10 @@ class NotesScreenState extends State<NotesScreen> {
                   final newNote = await Navigator.push<Note>(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const AddNoteScreen()),
+                      builder: (context) => AddNoteScreen(
+                        noteTypes: _noteTypes, // Pass the fetched note types
+                      ),
+                    ),
                   );
                   if (newNote != null) {
                     _addOrEditNote(newNote); // Add the new note if not null
@@ -214,134 +246,37 @@ class NotesScreenState extends State<NotesScreen> {
       body: Center(
         child: Container(
           width: MediaQuery.of(context).size.width * 0.9, // Set width to 90%
-          child: ListView.builder(
-            itemCount: _notes.length, // Display the number of notes
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(_notes[index].title), // Display note title
-                onTap: () => _editNote(index), // Edit note on tap
-                trailing: Ink(
-                  decoration: const ShapeDecoration(
-                    color: Colors.red, // Background color for the delete button
-                    shape: CircleBorder(),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.delete,
-                        color: Colors.white), // Set icon color to white
-                    onPressed: () {
-                      _deleteNote(index); // Call delete method on press
-                    },
-                  ),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _notes.length, // Display the number of notes
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(_notes[index].title), // Display note title
+                      onTap: () => _editNote(index), // Edit note on tap
+                      trailing: Ink(
+                        decoration: const ShapeDecoration(
+                          color: Colors
+                              .red, // Background color for the delete button
+                          shape: CircleBorder(),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.delete,
+                              color: Colors.white), // Set icon color to white
+                          onPressed: () {
+                            _deleteNote(index); // Call delete method on press
+                          },
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
+              ),
+              const Divider(), // Add a separator
+              // Removed the Note Types section
+            ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class AddNoteScreen extends StatefulWidget {
-  const AddNoteScreen({
-    Key? key,
-    this.title,
-    this.content,
-    this.id,
-    this.isEditing = false,
-  }) : super(key: key);
-
-  final String? title; // Title of the note (for editing)
-  final String? content; // Content of the note (for editing)
-  final String? id; // ID of the note (for editing)
-  final bool isEditing; // Flag to indicate if we are editing
-
-  @override
-  _AddNoteScreenState createState() => _AddNoteScreenState();
-}
-
-class _AddNoteScreenState extends State<AddNoteScreen> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _contentController = TextEditingController();
-
-  String selectedNoteType = 'Normal'; // Default selected note type
-  List<String> noteTypes = [
-    'Normal',
-    'To-Do',
-    'Shopping List'
-  ]; // Example note types
-
-  @override
-  void initState() {
-    super.initState();
-    _titleController.text = widget.title ?? '';
-    _contentController.text = widget.content ?? '';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.isEditing ? 'Edit Note' : 'Add Note'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Title'),
-            ),
-            DropdownButton<String>(
-              value: selectedNoteType,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedNoteType = newValue!;
-                });
-              },
-              items: noteTypes.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            TextField(
-              controller: _contentController,
-              decoration: const InputDecoration(labelText: 'Content'),
-              maxLines: null,
-              keyboardType: TextInputType.multiline,
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (_titleController.text.isNotEmpty &&
-                    _contentController.text.isNotEmpty) {
-                  // Create a new note object
-                  final newNote = Note(
-                    title: _titleController.text,
-                    content: _contentController.text,
-                    id: widget.id, // Pass the ID if editing
-                  );
-
-                  if (widget.isEditing && widget.id != null) {
-                    // Update the note in Firestore
-                    await FirebaseFirestore.instance
-                        .collection('notes')
-                        .doc(widget.id) // Use the document ID to update
-                        .update(newNote.toMap());
-                  } else {
-                    // Save the note to Firestore
-                    await FirebaseFirestore.instance
-                        .collection('notes')
-                        .add(newNote.toMap());
-                  }
-
-                  Navigator.pop(context, newNote); // Return the new note
-                }
-              },
-              child: const Text('Save Note'), // Button text remains the same
-            ),
-          ],
         ),
       ),
     );

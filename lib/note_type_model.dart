@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+
 class NoteType {
   String name;
   String? description; // Optional
@@ -26,8 +28,10 @@ class NoteType {
     return NoteType(
       name: map['name'],
       description: map['description'],
-      createdAt: DateTime.parse(map['createdAt']),
-      updatedAt: DateTime.parse(map['updatedAt']),
+      createdAt: (map['createdAt'] as Timestamp)
+          .toDate(), // Convert Timestamp to DateTime
+      updatedAt: (map['updatedAt'] as Timestamp)
+          .toDate(), // Convert Timestamp to DateTime
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore// Import Firestore
 
 class AddNoteTypeScreen extends StatefulWidget {
   const AddNoteTypeScreen({Key? key}) : super(key: key);
@@ -39,6 +39,8 @@ class _AddNoteTypeScreenState extends State<AddNoteTypeScreen> {
                   final newNoteType = {
                     'name': _nameController.text,
                     'description': _descriptionController.text,
+                    'createdAt': DateTime.now(), // Add createdAt timestamp
+                    'updatedAt': DateTime.now(), // Add updatedAt timestamp
                   };
 
                   // Save the new note type to Firestore
