@@ -53,6 +53,12 @@ class NotesScreen extends StatefulWidget {
 
 class NotesScreenState extends State<NotesScreen> {
   final List<Note> _notes = []; // Initialize with an empty list
+  bool isAdmin = true; // Set to true to simulate admin access
+  List<String> noteTypes = [
+    'Normal',
+    'To-Do',
+    'Shopping List'
+  ]; // Example note types
 
   @override
   void initState() {
@@ -132,12 +138,40 @@ class NotesScreenState extends State<NotesScreen> {
     }
   }
 
+  void _showAdminOptions() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Manage Note Types'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // List existing note types and provide options to add/edit/delete
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Notes'),
         actions: [
+          if (isAdmin) // Only show admin options if isAdmin is true
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: _showAdminOptions, // Show admin options
+            ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: Ink(
@@ -195,10 +229,14 @@ class NotesScreenState extends State<NotesScreen> {
   }
 }
 
-class AddNoteScreen extends StatelessWidget {
-  const AddNoteScreen(
-      {Key? key, this.title, this.content, this.id, this.isEditing = false})
-      : super(key: key);
+class AddNoteScreen extends StatefulWidget {
+  const AddNoteScreen({
+    Key? key,
+    this.title,
+    this.content,
+    this.id,
+    this.isEditing = false,
+  }) : super(key: key);
 
   final String? title; // Title of the note (for editing)
   final String? content; // Content of the note (for editing)
@@ -206,16 +244,32 @@ class AddNoteScreen extends StatelessWidget {
   final bool isEditing; // Flag to indicate if we are editing
 
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController _titleController =
-        TextEditingController(text: title);
-    final TextEditingController _contentController =
-        TextEditingController(text: content);
+  _AddNoteScreenState createState() => _AddNoteScreenState();
+}
 
+class _AddNoteScreenState extends State<AddNoteScreen> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
+
+  String selectedNoteType = 'Normal'; // Default selected note type
+  List<String> noteTypes = [
+    'Normal',
+    'To-Do',
+    'Shopping List'
+  ]; // Example note types
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController.text = widget.title ?? '';
+    _contentController.text = widget.content ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-            isEditing ? 'Edit Note' : 'Add Note'), // Change title based on mode
+        title: Text(widget.isEditing ? 'Edit Note' : 'Add Note'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -223,17 +277,27 @@ class AddNoteScreen extends StatelessWidget {
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title', // Label for the title field
-              ),
-              readOnly: false, // Allow editing of the title
+              decoration: const InputDecoration(labelText: 'Title'),
+            ),
+            DropdownButton<String>(
+              value: selectedNoteType,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedNoteType = newValue!;
+                });
+              },
+              items: noteTypes.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
             TextField(
               controller: _contentController,
-              decoration: const InputDecoration(
-                labelText: 'Content', // Label for the content field
-              ),
-              readOnly: false, // Allow editing of the content
+              decoration: const InputDecoration(labelText: 'Content'),
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
             ),
             ElevatedButton(
               onPressed: () async {
@@ -243,14 +307,14 @@ class AddNoteScreen extends StatelessWidget {
                   final newNote = Note(
                     title: _titleController.text,
                     content: _contentController.text,
-                    id: id, // Pass the ID if editing
+                    id: widget.id, // Pass the ID if editing
                   );
 
-                  if (isEditing && id != null) {
+                  if (widget.isEditing && widget.id != null) {
                     // Update the note in Firestore
                     await FirebaseFirestore.instance
                         .collection('notes')
-                        .doc(id) // Use the document ID to update
+                        .doc(widget.id) // Use the document ID to update
                         .update(newNote.toMap());
                   } else {
                     // Save the note to Firestore
