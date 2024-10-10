@@ -63,6 +63,7 @@ class NotesScreenState extends State<NotesScreen> {
     'Shopping List'
   ]; // Example note types
   List<NoteType> _noteTypes = []; // List to store fetched note types
+  String selectedNoteType = 'All'; // Default to show all notes
 
   @override
   void initState() {
@@ -205,6 +206,11 @@ class NotesScreenState extends State<NotesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Create a filtered list based on the selected note type
+    List<Note> filteredNotes = selectedNoteType == 'All'
+        ? _notes
+        : _notes.where((note) => note.noteType == selectedNoteType).toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Notes'),
@@ -214,70 +220,76 @@ class NotesScreenState extends State<NotesScreen> {
               icon: const Icon(Icons.settings),
               onPressed: _showAdminOptions, // Show admin options
             ),
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Ink(
-              decoration: const ShapeDecoration(
-                color: Colors.blue, // Background color for the button
-                shape: CircleBorder(),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.add,
-                    color: Colors.white), // Set icon color to white
-                onPressed: () async {
-                  // Navigate to AddNoteScreen and wait for the result
-                  final newNote = await Navigator.push<Note>(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddNoteScreen(
-                        noteTypes: _noteTypes, // Pass the fetched note types
+        ],
+      ),
+      body: Column(
+        children: [
+          // Dropdown for selecting note type
+          DropdownButton<String>(
+            value: selectedNoteType,
+            onChanged: (String? newValue) {
+              setState(() {
+                selectedNoteType = newValue!;
+              });
+            },
+            items: ['All', ..._noteTypes.map((type) => type.name)]
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
+          Expanded(
+            child: Container(
+              width:
+                  MediaQuery.of(context).size.width * 0.9, // Set width to 90%
+              child: ListView.builder(
+                itemCount: filteredNotes.length, // Use filtered notes count
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title:
+                        Text(filteredNotes[index].title), // Display note title
+                    onTap: () => _editNote(index), // Edit note on tap
+                    trailing: Ink(
+                      decoration: const ShapeDecoration(
+                        color: Colors
+                            .red, // Background color for the delete button
+                        shape: CircleBorder(),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.delete,
+                            color: Colors.white), // Set icon color to white
+                        onPressed: () {
+                          _deleteNote(index); // Call delete method on press
+                        },
                       ),
                     ),
                   );
-                  if (newNote != null) {
-                    _addOrEditNote(newNote); // Add the new note if not null
-                  }
                 },
               ),
             ),
           ),
         ],
       ),
-      body: Center(
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.9, // Set width to 90%
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _notes.length, // Display the number of notes
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(_notes[index].title), // Display note title
-                      onTap: () => _editNote(index), // Edit note on tap
-                      trailing: Ink(
-                        decoration: const ShapeDecoration(
-                          color: Colors
-                              .red, // Background color for the delete button
-                          shape: CircleBorder(),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.delete,
-                              color: Colors.white), // Set icon color to white
-                          onPressed: () {
-                            _deleteNote(index); // Call delete method on press
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // Navigate to AddNoteScreen to add a new note
+          final newNote = await Navigator.push<Note>(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddNoteScreen(
+                noteTypes: _noteTypes, // Pass the fetched note types
               ),
-              const Divider(), // Add a separator
-              // Removed the Note Types section
-            ],
-          ),
-        ),
+            ),
+          );
+          if (newNote != null) {
+            _addOrEditNote(newNote); // Add the new note if not null
+          }
+        },
+        child: const Icon(Icons.add), // Icon for the add button
+        backgroundColor:
+            const Color(0xFF65B6FC), // Set the background color to light blue
       ),
     );
   }
