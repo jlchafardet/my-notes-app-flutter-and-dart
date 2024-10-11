@@ -152,31 +152,145 @@ class NotesScreenState extends State<NotesScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Manage Note Types'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddNoteTypeScreen(),
+          content: Container(
+            width:
+                MediaQuery.of(context).size.width * 0.8, // 80% of screen width
+            height: MediaQuery.of(context).size.height *
+                0.5, // 50% of screen height
+            child: Column(
+              children: [
+                // Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Text(
+                    'Manage Note Types',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                // List of Note Types
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _noteTypes
+                        .length, // Assuming _noteTypes is a list of your note types
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _noteTypes[index]
+                                    .name, // Display note type name
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors
+                                    .red, // Set the background color to red
+                                shape: BoxShape.circle, // Make it circular
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.delete,
+                                    color: Colors.white), // Trash icon
+                                onPressed: () async {
+                                  // Confirm deletion
+                                  bool? confirm = await showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Confirm Deletion'),
+                                        content: const Text(
+                                            'Are you sure you want to delete this note type?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context)
+                                                    .pop(false), // No
+                                            child: const Text('No'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context)
+                                                    .pop(true), // Yes
+                                            child: const Text('Yes'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+
+                                  if (confirm == true) {
+                                    // Delete the note type from Firestore
+                                    await FirebaseFirestore.instance
+                                        .collection('noteTypes')
+                                        .doc(_noteTypes[index]
+                                            .id) // Use the document ID to delete
+                                        .delete();
+
+                                    // Update the local list
+                                    setState(() {
+                                      _noteTypes.removeAt(
+                                          index); // Remove from the list
+                                    });
+                                  }
+                                },
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                iconSize: 30,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                // Bottom Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AddNoteTypeScreen(),
+                          ),
+                        ); // Navigate to AddNoteTypeScreen
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(
+                            0xFF65B6FC), // Set to the same color as the add button
+                      ),
+                      child: const Text(
+                        'Add New Note Type',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold), // White bold text
+                      ),
                     ),
-                  ); // Navigate to AddNoteTypeScreen
-                },
-                child: const Text('Add New Note Type'),
-              ),
-              // Additional options for editing/deleting note types can be added here
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
+                    ElevatedButton(
+                      onPressed: () =>
+                          Navigator.of(context).pop(), // Close the dialog
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange, // Set to orange
+                      ),
+                      child: const Text(
+                        'Close',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold), // White bold text
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -202,6 +316,63 @@ class NotesScreenState extends State<NotesScreen> {
     } catch (e) {
       print('Error fetching note types: $e'); // Log any errors
     }
+  }
+
+  void _editNoteType() async {
+    // Assuming you have a way to select which note type to edit
+    final selectedNoteType =
+        await _selectNoteType(); // Implement this method to select a note type
+    if (selectedNoteType != null) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              AddNoteTypeScreen(noteType: selectedNoteType, isEditing: true),
+        ),
+      );
+      _fetchNoteTypes(); // Refresh the note types after editing
+    }
+  }
+
+  // Add this method to your NotesScreenState class
+  Future<NoteType?> _selectNoteType() async {
+    // Create a list of note type names for selection
+    List<String> noteTypeNames = _noteTypes.map((type) => type.name).toList();
+
+    // Show a dialog to select a note type
+    return showDialog<NoteType>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Note Type to Edit'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: noteTypeNames.map((String noteTypeName) {
+                return ListTile(
+                  title: Text(noteTypeName),
+                  onTap: () {
+                    // Find the NoteType object by name
+                    NoteType selectedType = _noteTypes
+                        .firstWhere((type) => type.name == noteTypeName);
+                    Navigator.of(context)
+                        .pop(selectedType); // Return the selected note type
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(); // Close the dialog without selection
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

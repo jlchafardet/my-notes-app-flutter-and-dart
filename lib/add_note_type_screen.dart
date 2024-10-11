@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore// Import Firestore
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'note_type_model.dart'; // Import the NoteType model
 
 class AddNoteTypeScreen extends StatefulWidget {
-  const AddNoteTypeScreen({Key? key}) : super(key: key);
+  final NoteType? noteType; // Optional NoteType for editing
+  final bool isEditing; // Flag to indicate if we are editing
+
+  const AddNoteTypeScreen({Key? key, this.noteType, this.isEditing = false})
+      : super(key: key);
 
   @override
   _AddNoteTypeScreenState createState() => _AddNoteTypeScreenState();
@@ -13,10 +18,20 @@ class _AddNoteTypeScreenState extends State<AddNoteTypeScreen> {
   final TextEditingController _descriptionController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.isEditing && widget.noteType != null) {
+      _nameController.text = widget.noteType!.name; // Set the initial name
+      _descriptionController.text =
+          widget.noteType!.description ?? ''; // Set the initial description
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Note Type'),
+        title: Text(widget.isEditing ? 'Edit Note Type' : 'Add Note Type'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -39,20 +54,29 @@ class _AddNoteTypeScreenState extends State<AddNoteTypeScreen> {
                   final newNoteType = {
                     'name': _nameController.text,
                     'description': _descriptionController.text,
-                    'createdAt': DateTime.now(), // Add createdAt timestamp
-                    'updatedAt': DateTime.now(), // Add updatedAt timestamp
+                    'updatedAt': DateTime.now(), // Update timestamp
                   };
 
-                  // Save the new note type to Firestore
-                  await FirebaseFirestore.instance
-                      .collection('noteTypes')
-                      .add(newNoteType);
+                  if (widget.isEditing && widget.noteType != null) {
+                    // Update the note type in Firestore
+                    await FirebaseFirestore.instance
+                        .collection('noteTypes')
+                        .doc(widget
+                            .noteType!.id) // Use the document ID to update
+                        .update(newNoteType);
+                  } else {
+                    // Save the new note type to Firestore
+                    await FirebaseFirestore.instance
+                        .collection('noteTypes')
+                        .add(newNoteType);
+                  }
 
                   Navigator.pop(context); // Return to the previous screen
                 }
               },
-              child: const Text('Save Note Type'),
+              child: Text(widget.isEditing ? 'Save Changes' : 'Save Note Type'),
             ),
+            // Removed the delete button
           ],
         ),
       ),

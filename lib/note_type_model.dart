@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
 class NoteType {
+  String id; // Add this line to store the document ID
   String name;
   String? description; // Optional
   DateTime createdAt;
   DateTime updatedAt;
 
   NoteType({
+    required this.id, // Include id in the constructor
     required this.name,
     this.description,
     required this.createdAt,
@@ -16,6 +18,7 @@ class NoteType {
   // Convert a NoteType object into a Map
   Map<String, dynamic> toMap() {
     return {
+      'id': id, // Include id in the map
       'name': name,
       'description': description,
       'createdAt': createdAt.toIso8601String(),
@@ -26,6 +29,7 @@ class NoteType {
   // Create a NoteType object from a Map
   factory NoteType.fromMap(Map<String, dynamic> map) {
     return NoteType(
+      id: map['id'], // Include id in the factory
       name: map['name'],
       description: map['description'],
       createdAt: (map['createdAt'] as Timestamp)
