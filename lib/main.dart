@@ -36,7 +36,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
 }
 
 class NotesScreen extends StatefulWidget {
-  const NotesScreen({Key? key}) : super(key: key);
+  const NotesScreen({super.key});
 
   @override
   NotesScreenState createState() => NotesScreenState();
@@ -64,6 +64,7 @@ class NotesScreenState extends State<NotesScreen> {
   ]; // Example note types
   List<NoteType> _noteTypes = []; // List to store fetched note types
   String selectedNoteType = 'All'; // Default to show all notes
+  int? _hoveredIndex; // Add this variable to keep track of the hovered index
 
   @override
   void initState() {
@@ -152,7 +153,7 @@ class NotesScreenState extends State<NotesScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          content: Container(
+          content: SizedBox(
             width:
                 MediaQuery.of(context).size.width * 0.8, // 80% of screen width
             height: MediaQuery.of(context).size.height *
@@ -171,78 +172,40 @@ class NotesScreenState extends State<NotesScreen> {
                 // List of Note Types
                 Expanded(
                   child: ListView.builder(
-                    itemCount: _noteTypes
-                        .length, // Assuming _noteTypes is a list of your note types
+                    itemCount: _noteTypes.length,
                     itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                _noteTypes[index]
-                                    .name, // Display note type name
-                                style: TextStyle(fontSize: 16),
+                      return ListTile(
+                        title: Text(
+                          _noteTypes[index].name,
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        onTap: () async {
+                          // Open the AddNoteTypeScreen in edit mode
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddNoteTypeScreen(
+                                noteType: _noteTypes[index],
+                                isEditing: true,
                               ),
                             ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors
-                                    .red, // Set the background color to red
-                                shape: BoxShape.circle, // Make it circular
-                              ),
-                              child: IconButton(
-                                icon: const Icon(Icons.delete,
-                                    color: Colors.white), // Trash icon
-                                onPressed: () async {
-                                  // Confirm deletion
-                                  bool? confirm = await showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text('Confirm Deletion'),
-                                        content: const Text(
-                                            'Are you sure you want to delete this note type?'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.of(context)
-                                                    .pop(false), // No
-                                            child: const Text('No'),
-                                          ),
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.of(context)
-                                                    .pop(true), // Yes
-                                            child: const Text('Yes'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-
-                                  if (confirm == true) {
-                                    // Delete the note type from Firestore
-                                    await FirebaseFirestore.instance
-                                        .collection('noteTypes')
-                                        .doc(_noteTypes[index]
-                                            .id) // Use the document ID to delete
-                                        .delete();
-
-                                    // Update the local list
-                                    setState(() {
-                                      _noteTypes.removeAt(
-                                          index); // Remove from the list
-                                    });
-                                  }
-                                },
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                iconSize: 30,
-                              ),
-                            ),
-                          ],
+                          );
+                          _fetchNoteTypes(); // Refresh the note types after editing
+                        },
+                        trailing: Ink(
+                          decoration: const ShapeDecoration(
+                            color: Colors
+                                .red, // Background color for the delete button
+                            shape: CircleBorder(),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.delete,
+                                color: Colors.white), // Set icon color to white
+                            onPressed: () {
+                              _deleteNoteType(
+                                  index); // Call delete method on press
+                            },
+                          ),
                         ),
                       );
                     },
@@ -375,6 +338,42 @@ class NotesScreenState extends State<NotesScreen> {
     );
   }
 
+  // Method to delete a note type
+  void _deleteNoteType(int index) async {
+    // Confirm deletion
+    bool? confirm = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content:
+              const Text('Are you sure you want to delete this note type?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // No
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Yes
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      // Delete the note type from Firestore
+      await FirebaseFirestore.instance
+          .collection('noteTypes')
+          .doc(_noteTypes[index].id) // Use the document ID to delete
+          .delete();
+
+      // Re-fetch note types to update the list
+      _fetchNoteTypes(); // Refresh the note types after deletion
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Create a filtered list based on the selected note type
@@ -412,7 +411,7 @@ class NotesScreenState extends State<NotesScreen> {
             }).toList(),
           ),
           Expanded(
-            child: Container(
+            child: SizedBox(
               width:
                   MediaQuery.of(context).size.width * 0.9, // Set width to 90%
               child: ListView.builder(
@@ -457,10 +456,9 @@ class NotesScreenState extends State<NotesScreen> {
           if (newNote != null) {
             _addOrEditNote(newNote); // Add the new note if not null
           }
-        },
-        child: const Icon(Icons.add), // Icon for the add button
-        backgroundColor:
-            const Color(0xFF65B6FC), // Set the background color to light blue
+        }, // Icon for the add button
+        backgroundColor: const Color(0xFF65B6FC),
+        child: const Icon(Icons.add), // Set the background color to light blue
       ),
     );
   }

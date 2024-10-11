@@ -6,8 +6,7 @@ class AddNoteTypeScreen extends StatefulWidget {
   final NoteType? noteType; // Optional NoteType for editing
   final bool isEditing; // Flag to indicate if we are editing
 
-  const AddNoteTypeScreen({Key? key, this.noteType, this.isEditing = false})
-      : super(key: key);
+  const AddNoteTypeScreen({super.key, this.noteType, this.isEditing = false});
 
   @override
   _AddNoteTypeScreenState createState() => _AddNoteTypeScreenState();
@@ -54,7 +53,11 @@ class _AddNoteTypeScreenState extends State<AddNoteTypeScreen> {
                   final newNoteType = {
                     'name': _nameController.text,
                     'description': _descriptionController.text,
-                    'updatedAt': DateTime.now(), // Update timestamp
+                    'createdAt': widget.isEditing
+                        ? widget.noteType!.createdAt
+                        : DateTime.now(), // Set createdAt only when adding
+                    'updatedAt': DateTime.now(), // Always update updatedAt
+                    'fields': '{}', // Initialize fields as an empty JSON object
                   };
 
                   if (widget.isEditing && widget.noteType != null) {

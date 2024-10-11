@@ -5,14 +5,14 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
 class AddNoteScreen extends StatefulWidget {
   const AddNoteScreen({
-    Key? key,
+    super.key,
     this.title,
     this.content,
     this.id,
     this.isEditing = false,
     this.selectedNoteType,
     required this.noteTypes, // Add this line
-  }) : super(key: key);
+  });
 
   final String? title; // Title of the note (for editing)
   final String? content; // Content of the note (for editing)
