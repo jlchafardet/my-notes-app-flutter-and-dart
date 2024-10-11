@@ -64,7 +64,7 @@ class NotesScreenState extends State<NotesScreen> {
   ]; // Example note types
   List<NoteType> _noteTypes = []; // List to store fetched note types
   String selectedNoteType = 'All'; // Default to show all notes
-  int? _hoveredIndex; // Add this variable to keep track of the hovered index
+// Add this variable to keep track of the hovered index
 
   @override
   void initState() {
