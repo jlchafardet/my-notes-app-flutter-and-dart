@@ -65,7 +65,7 @@ class NotesScreenState extends State<NotesScreen> {
   void initState() {
     super.initState();
     _fetchNotes(); // Fetch notes from Firestore when the screen is initialized
-    _fetchNoteTypes(); // Fetch note types from Firestore
+    //_fetchNoteTypes(); // Fetch note types from Firestore
   }
 
   // Method to fetch notes from Firestore
@@ -84,7 +84,7 @@ class NotesScreenState extends State<NotesScreen> {
       });
     } catch (e) {
       // Optional: Log any errors
-      // print('Error fetching notes: $e'); // Removed for debugging
+      print('Error fetching notes: $e'); // Removed for debugging
     }
   }
 
@@ -167,42 +167,70 @@ class NotesScreenState extends State<NotesScreen> {
                 ),
                 // List of Note Types
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: _noteTypes.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          _noteTypes[index].name,
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        onTap: () async {
-                          // Open the AddNoteTypeScreen in edit mode
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddNoteTypeScreen(
-                                noteType: _noteTypes[index],
-                                isEditing: true,
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('noteTypes')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator(); // Show a loading indicator while waiting for data
+                      }
+                      if (snapshot.hasError) {
+                        return Text(
+                            'Error: ${snapshot.error}'); // Display error message if there's an error
+                      }
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Text(
+                            'No note types available'); // Display message if no data is available
+                      }
+
+                      // Map the snapshot data to a list of NoteType objects
+                      _noteTypes = snapshot.data!.docs.map((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        data['id'] = doc.id;
+                        return NoteType.fromMap(data);
+                      }).toList();
+
+                      // Build the ListView with the fetched note types
+                      return ListView.builder(
+                        itemCount: _noteTypes.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(
+                              _noteTypes[index].name,
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            onTap: () async {
+                              // Open the AddNoteTypeScreen in edit mode
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddNoteTypeScreen(
+                                    noteType: _noteTypes[index],
+                                    isEditing: true,
+                                  ),
+                                ),
+                              );
+                              // No need to manually refresh note types, StreamBuilder handles it
+                            },
+                            trailing: Ink(
+                              decoration: const ShapeDecoration(
+                                color: Colors
+                                    .red, // Background color for the delete button
+                                shape: CircleBorder(),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.delete,
+                                    color: Colors
+                                        .white), // Set icon color to white
+                                onPressed: () {
+                                  _deleteNoteType(
+                                      index); // Call delete method on press
+                                },
                               ),
                             ),
                           );
-                          _fetchNoteTypes(); // Refresh the note types after editing
                         },
-                        trailing: Ink(
-                          decoration: const ShapeDecoration(
-                            color: Colors
-                                .red, // Background color for the delete button
-                            shape: CircleBorder(),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.delete,
-                                color: Colors.white), // Set icon color to white
-                            onPressed: () {
-                              _deleteNoteType(
-                                  index); // Call delete method on press
-                            },
-                          ),
-                        ),
                       );
                     },
                   ),
@@ -391,20 +419,65 @@ class NotesScreenState extends State<NotesScreen> {
       body: Column(
         children: [
           // Dropdown for selecting note type
-          DropdownButton<String>(
-            value: selectedNoteType,
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedNoteType = newValue!;
-              });
-            },
-            items: ['All', ..._noteTypes.map((type) => type.name)]
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
+          // DropdownButton<String>(
+          //   value: selectedNoteType,
+          //   onChanged: (String? newValue) {
+          //     setState(() {
+          //       selectedNoteType = newValue!;
+          //     });
+          //   },
+          //   items: ['All', ..._noteTypes.map((type) => type.name)]
+          //       .map<DropdownMenuItem<String>>((String value) {
+          //     return DropdownMenuItem<String>(
+          //       value: value,
+          //       child: Text(value),
+          //     );
+          //   }).toList(),
+          // ),
+          StreamBuilder<QuerySnapshot>(
+            stream:
+                FirebaseFirestore.instance.collection('noteTypes').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator(); // Show a loading indicator
+              }
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              }
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return Text('No note types available');
+              }
+
+              _noteTypes = snapshot.data!.docs.map((doc) {
+                final data = doc.data() as Map<String, dynamic>;
+                data['id'] = doc.id;
+                return NoteType.fromMap(data);
+              }).toList();
+
+              // Ensure the selectedNoteType is valid
+              if (!['All', ..._noteTypes.map((type) => type.name)]
+                  .contains(selectedNoteType)) {
+                selectedNoteType = 'All';
+              }
+
+              return DropdownButton<String>(
+                value: selectedNoteType,
+                onChanged: (String? newValue) {
+                  if (newValue != null && newValue != selectedNoteType) {
+                    setState(() {
+                      selectedNoteType = newValue;
+                    });
+                  }
+                },
+                items: ['All', ..._noteTypes.map((type) => type.name)]
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               );
-            }).toList(),
+            },
           ),
           Expanded(
             child: SizedBox(
