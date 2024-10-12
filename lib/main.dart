@@ -57,11 +57,6 @@ class NotesScreen extends StatefulWidget {
 class NotesScreenState extends State<NotesScreen> {
   final List<Note> _notes = []; // Initialize with an empty list
   bool isAdmin = true; // Set to true to simulate admin access
-  List<String> noteTypes = [
-    'Normal',
-    'To-Do',
-    'Shopping List'
-  ]; // Example note types
   List<NoteType> _noteTypes = []; // List to store fetched note types
   String selectedNoteType = 'All'; // Default to show all notes
 // Add this variable to keep track of the hovered index
@@ -88,7 +83,8 @@ class NotesScreenState extends State<NotesScreen> {
         _notes.addAll(notes); // Add the fetched notes to the list
       });
     } catch (e) {
-      print('Error fetching notes: $e'); // Log any errors
+      // Optional: Log any errors
+      // print('Error fetching notes: $e'); // Removed for debugging
     }
   }
 
@@ -98,13 +94,13 @@ class NotesScreenState extends State<NotesScreen> {
       setState(() {
         _notes[index] = note; // Update the note at the specified index
       });
-      print('${note.title} note was modified'); // Log when a note is modified
+      // print('${note.title} note was modified'); // Removed for debugging
     } else {
       // Add new note
       setState(() {
         _notes.add(note); // Add note to the list
       });
-      print('New note added: ${note.title}'); // Log when a new note is added
+      // print('New note added: ${note.title}'); // Removed for debugging
     }
   }
 
@@ -137,7 +133,7 @@ class NotesScreenState extends State<NotesScreen> {
     setState(() {
       _notes.removeAt(index); // Remove the note at the specified index
     });
-    print('$deletedNoteTitle was deleted'); // Log when a note is deleted
+    // print('$deletedNoteTitle was deleted'); // Removed for debugging
 
     // Delete the note from Firestore
     if (deletedNoteId != null) {
