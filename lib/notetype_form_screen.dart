@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
-import 'note_type_model.dart'; // Import the NoteType model
+import 'notetype_model.dart'; // Import the NoteType model
 
 class AddNoteTypeScreen extends StatefulWidget {
   final NoteType? noteType; // Optional NoteType for editing

@@ -13,9 +13,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'note_model.dart'; // Import the Note model
-import 'add_note_type_screen.dart'; // Import the AddNoteTypeScreen
-import 'note_type_model.dart'; // Import the NoteType model
-import 'add_note_screen.dart'; // Import the AddNoteScreen
+import 'notetype_form_screen.dart'; // Import the AddNoteTypeScreen
+import 'notetype_model.dart'; // Import the NoteType model
+import 'note_form_screen.dart'; // Import the AddNoteScreen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
