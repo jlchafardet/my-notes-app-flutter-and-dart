@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'tag_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore package
 
 class TagFormScreen extends StatefulWidget {
   final Tag? tag; // Optional tag for editing
@@ -28,12 +29,30 @@ class _TagFormScreenState extends State<TagFormScreen> {
 
   void _saveTag() {
     if (_formKey.currentState!.validate()) {
-      final newTag = Tag(
-        id: widget.tag?.id ?? UniqueKey().toString(),
-        name: _tagName,
-      );
-      widget.onSave(newTag); // Call the save callback
-      Navigator.pop(context); // Go back to the previous screen
+      final tagRef = FirebaseFirestore.instance
+          .collection('tags'); // Reference to the tags collection
+
+      if (widget.tag == null) {
+        // Adding a new tag
+        tagRef.add({'name': _tagName}).then((value) {
+          Navigator.pop(context); // Close the form after saving
+        }).catchError((error) {
+          // Handle error
+          print("Failed to add tag: $error");
+        });
+      } else {
+        // Updating an existing tag
+        tagRef.where('name', isEqualTo: widget.tag).get().then((snapshot) {
+          if (snapshot.docs.isNotEmpty) {
+            snapshot.docs.first.reference.update({'name': _tagName}).then((_) {
+              Navigator.pop(context); // Close the form after saving
+            }).catchError((error) {
+              // Handle error
+              print("Failed to update tag: $error");
+            });
+          }
+        });
+      }
     }
   }
 
