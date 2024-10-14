@@ -42,7 +42,10 @@ class _TagFormScreenState extends State<TagFormScreen> {
         });
       } else {
         // Updating an existing tag
-        tagRef.where('name', isEqualTo: widget.tag).get().then((snapshot) {
+        tagRef
+            .where('name', isEqualTo: widget.tag!.name)
+            .get()
+            .then((snapshot) {
           if (snapshot.docs.isNotEmpty) {
             snapshot.docs.first.reference.update({'name': _tagName}).then((_) {
               Navigator.pop(context); // Close the form after saving

@@ -16,6 +16,7 @@ import 'note_model.dart'; // Import the Note model
 import 'notetype_form_screen.dart'; // Import the AddNoteTypeScreen
 import 'notetype_model.dart'; // Import the NoteType model
 import 'note_form_screen.dart'; // Import the AddNoteScreen
+import 'tag_management_screen.dart'; // Import the Tag Management Screen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -398,6 +399,14 @@ class NotesScreenState extends State<NotesScreen> {
     }
   }
 
+  // Method to navigate to the Tag Management Screen
+  void _navigateToTagManagement() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => TagManagementScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Create a filtered list based on the selected note type
@@ -414,6 +423,10 @@ class NotesScreenState extends State<NotesScreen> {
               icon: const Icon(Icons.settings),
               onPressed: _showAdminOptions, // Show admin options
             ),
+          IconButton(
+            icon: const Icon(Icons.tag), // Icon for the button
+            onPressed: _navigateToTagManagement, // Call the navigation method
+          ),
         ],
       ),
       body: Column(
