@@ -3,8 +3,8 @@ import 'note_model.dart'; // Import the Note model
 import 'notetype_model.dart'; // Import the NoteType model
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
-class AddNoteScreen extends StatefulWidget {
-  const AddNoteScreen({
+class NoteFormScreen extends StatefulWidget {
+  const NoteFormScreen({
     super.key,
     this.title,
     this.content,
@@ -22,10 +22,11 @@ class AddNoteScreen extends StatefulWidget {
   final List<NoteType> noteTypes; // List of note types
 
   @override
-  _AddNoteScreenState createState() => _AddNoteScreenState();
+  NoteFormScreenState createState() =>
+      NoteFormScreenState(); // Change this line
 }
 
-class _AddNoteScreenState extends State<AddNoteScreen> {
+class NoteFormScreenState extends State<NoteFormScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
   String? selectedNoteType; // Variable to store the selected note type
@@ -104,7 +105,10 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                         .add(newNote.toMap());
                   }
 
-                  Navigator.pop(context, newNote); // Return the new note
+                  // Check if the widget is still mounted before using context
+                  if (mounted) {
+                    Navigator.pop(context, newNote); // Return the new note
+                  }
                 }
               },
               child: const Text('Save Note'),
