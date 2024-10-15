@@ -3,6 +3,7 @@ import 'tag_management_screen.dart'; // Import the Tag Management screen
 import 'notetype_admin_screen.dart'; // Import the NoteType Admin screen
 import 'admin_state.dart'; // Import the AdminState
 import 'main.dart'; // Import the MainScreen to access NotesScreen
+import 'about_screen.dart'; // Import the About screen
 
 class MenuDrawer extends StatelessWidget {
   @override
@@ -84,6 +85,19 @@ class MenuDrawer extends StatelessWidget {
                 );
               },
             ),
+          // Add the About screen link as the last item
+          ListTile(
+            title: Text('About'),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        AboutScreen()), // Navigate to About screen
+              );
+            },
+          ),
           // Add more menu items as needed
         ],
       ),
