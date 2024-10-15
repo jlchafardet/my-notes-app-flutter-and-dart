@@ -51,7 +51,7 @@ class NoteFormScreenState extends State<NoteFormScreen> {
           widget.tags ?? []; // Initialize selectedTags with the passed tags
 
       // Debugging: Print the selected tags
-      print("Selected Tags: $selectedTags");
+      //print("Selected Tags: $selectedTags");
     }
   }
 
