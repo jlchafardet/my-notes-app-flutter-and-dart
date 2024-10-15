@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
-import 'note_type_model.dart'; // Import the NoteType model
+import 'notetype_model.dart'; // Import the NoteType model
+import 'custom_app_bar.dart'; // Import the Custom App Bar
+import 'custom_footer.dart'; // Import the Custom Footer
+import 'menu_drawer.dart'; // Import the Menu Drawer
 
 class AddNoteTypeScreen extends StatefulWidget {
   final NoteType? noteType; // Optional NoteType for editing
@@ -29,13 +32,23 @@ class _AddNoteTypeScreenState extends State<AddNoteTypeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.isEditing ? 'Edit Note Type' : 'Add Note Type'),
-      ),
+      appBar: CustomAppBar(), // Use the Custom App Bar
+      endDrawer: MenuDrawer(), // Use the Menu Drawer
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            Center(
+              // Center the header
+              child: Text(
+                widget.isEditing
+                    ? 'Edit Type of Note'
+                    : 'Add New Type of Note', // Conditional header text
+                style: TextStyle(
+                    fontSize: 24, fontWeight: FontWeight.bold), // Header style
+              ),
+            ),
+            SizedBox(height: 20), // Space between header and fields
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Note Type Name'),
@@ -83,6 +96,7 @@ class _AddNoteTypeScreenState extends State<AddNoteTypeScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: CustomFooter(), // Use the Custom Footer
     );
   }
 }
