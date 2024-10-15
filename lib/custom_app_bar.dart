@@ -15,39 +15,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       backgroundColor: Colors.grey[800], // Dark gray background
       centerTitle: true, // Center the title
-      leading: IconButton(
-        icon:
-            Icon(Icons.menu, color: Colors.white), // Change icon color to white
-        onPressed: () {
-          // Open the drawer when the hamburger icon is tapped
-          Scaffold.of(context).openDrawer();
-        },
-      ),
+      iconTheme: IconThemeData(color: Colors.white), // Set icon color to white
       actions: [
-        PopupMenuButton<String>(
-          icon: Icon(Icons.menu, color: Colors.white), // White icon
-          onSelected: (value) {
-            if (value == 'tag_management') {
-              // Navigate to tag management screen
-              // Add your navigation logic here
-            } else if (value == 'admin_panel') {
-              // Navigate to admin panel
-              // Add your navigation logic here
-            }
-          },
-          itemBuilder: (BuildContext context) {
-            return [
-              PopupMenuItem<String>(
-                value: 'tag_management',
-                child: Text('Tag Management'),
-              ),
-              if (isAdmin) // Show Admin Panel only if isAdmin is true
-                PopupMenuItem<String>(
-                  value: 'admin_panel',
-                  child: Text('Admin Panel'),
-                ),
-            ];
-          },
+        Tooltip(
+          message: 'Show navigation menu', // Tooltip message
+          child: IconButton(
+            icon: Icon(Icons.menu, color: Colors.white), // Right hamburger icon
+            onPressed: () {
+              // Open the end drawer when the hamburger icon is tapped
+              Scaffold.of(context).openEndDrawer();
+            },
+          ),
         ),
       ],
     );

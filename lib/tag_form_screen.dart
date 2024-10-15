@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'tag_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore package
+import 'custom_app_bar.dart'; // Import the Custom App Bar
+import 'custom_footer.dart'; // Import the Custom Footer
+import 'menu_drawer.dart'; // Import the Menu Drawer
 
 class TagFormScreen extends StatefulWidget {
   final Tag? tag; // Optional tag for editing
@@ -62,37 +65,52 @@ class _TagFormScreenState extends State<TagFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.tag == null ? 'Add Tag' : 'Edit Tag'),
-      ),
+      appBar: CustomAppBar(), // Use the CustomAppBar
+      endDrawer: MenuDrawer(), // Use the MenuDrawer as an end drawer
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                initialValue: _tagName,
-                decoration: InputDecoration(labelText: 'Tag Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a tag name';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  _tagName = value; // Update the tag name as the user types
-                },
+        child: Column(
+          children: [
+            Center(
+              // Center the header
+              child: Text(
+                widget.tag == null
+                    ? 'Add New Tag'
+                    : 'Edit Tag', // Conditional header text
+                style: TextStyle(
+                    fontSize: 24, fontWeight: FontWeight.bold), // Header style
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _saveTag,
-                child: Text(widget.tag == null ? 'Add Tag' : 'Update Tag'),
+            ),
+            SizedBox(height: 20), // Space between header and form
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    initialValue: _tagName,
+                    decoration: InputDecoration(labelText: 'Tag Name'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a tag name';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      _tagName = value; // Update the tag name as the user types
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _saveTag,
+                    child: Text(widget.tag == null ? 'Add Tag' : 'Update Tag'),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+      bottomNavigationBar: CustomFooter(), // Use the CustomFooter
     );
   }
 }

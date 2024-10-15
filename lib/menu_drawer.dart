@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'tag_management_screen.dart'; // Import the Tag Management screen
+import 'notetype_admin_screen.dart'; // Import the NoteType Admin screen
+import 'admin_state.dart'; // Import the AdminState
+import 'main.dart'; // Import the MainScreen to access NotesScreen
 
 class MenuDrawer extends StatelessWidget {
   @override
@@ -17,6 +21,12 @@ class MenuDrawer extends StatelessWidget {
               padding: EdgeInsets.all(0.0), // Remove padding
               child: Row(
                 children: [
+                  IconButton(
+                    icon: Icon(Icons.close, color: Colors.white), // Close icon
+                    onPressed: () {
+                      Navigator.pop(context); // Close the drawer
+                    },
+                  ),
                   Expanded(
                     // Allow the text to take available space
                     child: Center(
@@ -24,28 +34,56 @@ class MenuDrawer extends StatelessWidget {
                       child: Text(
                         'Menu',
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20), // Adjust font size if needed
+                          color: Colors.white,
+                          fontSize: 20, // Adjust font size if needed
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.close, color: Colors.white), // Close icon
-                    onPressed: () {
-                      Navigator.pop(context); // Close the drawer
-                    },
                   ),
                 ],
               ),
             ),
           ),
+          // New link to go back to the main screen
+          ListTile(
+            title: Text('Notes'),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        NotesScreen()), // Navigate to Notes Screen
+                (Route<dynamic> route) => false, // Remove all other screens
+              );
+            },
+          ),
           ListTile(
             title: Text('Tag Management'),
             onTap: () {
               Navigator.pop(context); // Close the drawer
-              // Add your navigation logic here
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        TagManagementScreen()), // Navigate to Tag Management screen
+              );
             },
           ),
+          // Conditionally show the NoteType Admin link if isAdmin is true
+          if (AdminState().isAdmin) // Check if the user is an admin
+            ListTile(
+              title: Text('Note Type Management'),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          NoteTypeAdminScreen()), // Navigate to Note Type Admin screen
+                );
+              },
+            ),
           // Add more menu items as needed
         ],
       ),

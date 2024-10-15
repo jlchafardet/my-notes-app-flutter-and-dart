@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'tag_form_screen.dart'; // Import the Tag Form Screen
 import 'tag_model.dart'; // Import the Tag Model
+import 'custom_app_bar.dart'; // Import the Custom App Bar
+import 'custom_footer.dart'; // Import the Custom Footer
+import 'menu_drawer.dart'; // Import the Menu Drawer
 
 class TagManagementScreen extends StatefulWidget {
   @override
@@ -16,7 +19,6 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
   @override
   void initState() {
     super.initState();
-    // Remove the call to _fetchTags() here
   }
 
   void _addTag() {
@@ -28,7 +30,6 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
           onSave: (newTag) {
             // Logic to add the new tag to Firestore
             FirebaseFirestore.instance.collection('tags').add({'name': newTag});
-            // Remove the call to _fetchTags() here
           },
         ),
       ),
@@ -55,7 +56,6 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
               onSave: (updatedTag) {
                 // Logic to update the tag in Firestore
                 doc.reference.update({'name': updatedTag});
-                // Remove the call to _fetchTags() here
               },
             ),
           ),
@@ -75,11 +75,15 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false), // No
-              child: Text('No'),
+              child: Text('No Cancel'),
             ),
             TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.red, // Red background
+                foregroundColor: Colors.white, // White text
+              ),
               onPressed: () => Navigator.of(context).pop(true), // Yes
-              child: Text('Yes'),
+              child: Text('Yes Delete'),
             ),
           ],
         );
@@ -87,79 +91,81 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
     );
 
     if (confirm) {
-      // Logic to delete the tag from Firestore
-      final snapshot = await FirebaseFirestore.instance
-          .collection('tags')
-          .where('name', isEqualTo: tag)
-          .get();
-      if (snapshot.docs.isNotEmpty) {
-        await snapshot.docs.first.reference.delete(); // Delete the document
-        // Remove the call to _fetchTags() here
-      }
+      // Proceed with deletion
+      await FirebaseFirestore.instance.collection('tags').doc(tag).delete();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Tag Management'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back), // Back button icon
-          onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous screen
-          },
+      appBar: CustomAppBar(), // Use the Custom App Bar
+      endDrawer: MenuDrawer(), // Use endDrawer for the right-side drawer
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Tags',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream:
+                    FirebaseFirestore.instance.collection('tags').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(child: Text('No tags available'));
+                  }
+
+                  final tags = snapshot.data!.docs
+                      .map((doc) => doc['name'] as String)
+                      .toList();
+
+                  return ListView.builder(
+                    itemCount: tags.length,
+                    itemBuilder: (context, index) {
+                      final tag = tags[index];
+                      return ListTile(
+                        title: Text(tag),
+                        onTap: () => _editTag(tag),
+                        trailing: Ink(
+                          decoration: const ShapeDecoration(
+                            color:
+                                Colors.red, // Red background for delete button
+                            shape: CircleBorder(),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.delete,
+                                color: Colors.white), // White icon
+                            onPressed: () => _deleteTag(tag),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('tags')
-            .snapshots(), // Listen for changes
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-                child: CircularProgressIndicator()); // Show loading indicator
-          }
-          if (snapshot.hasError) {
-            return Center(
-                child: Text('Error: ${snapshot.error}')); // Handle errors
-          }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-                child: Text('No tags available')); // Handle empty state
-          }
-
-          // Map the fetched documents to a list of tag names
-          final tags =
-              snapshot.data!.docs.map((doc) => doc['name'] as String).toList();
-
-          return ListView.builder(
-            itemCount: tags.length,
-            itemBuilder: (context, index) {
-              final tag = tags[index];
-              return ListTile(
-                title: Text(tag),
-                onTap: () => _editTag(tag), // Edit tag on tap
-                trailing: Ink(
-                  decoration: const ShapeDecoration(
-                    color: Colors.red, // Background color for the delete button
-                    shape: CircleBorder(),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.delete,
-                        color: Colors.white), // Set icon color to white
-                    onPressed: () => _deleteTag(tag), // Delete tag
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
+      bottomNavigationBar: CustomFooter(), // Use the CustomFooter
+      floatingActionButtonLocation: FloatingActionButtonLocation
+          .endDocked, // Position the FAB at the bottom right, docked above the footer
       floatingActionButton: FloatingActionButton(
-        onPressed: _addTag, // Call the method to add a new tag
-        child: Icon(Icons.add), // Icon for the button
-        backgroundColor: Colors.blue, // Set the background color
+        onPressed: _addTag,
+        child: Icon(Icons.add), // Icon for the FAB
+        backgroundColor: Colors.blue, // Background color for the FAB
       ),
     );
   }

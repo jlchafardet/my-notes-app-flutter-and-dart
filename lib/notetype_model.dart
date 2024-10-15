@@ -29,13 +29,11 @@ class NoteType {
   // Create a NoteType object from a Map
   factory NoteType.fromMap(Map<String, dynamic> map) {
     return NoteType(
-      id: map['id'], // Include id in the factory
-      name: map['name'],
+      id: map['id'] ?? '', // Ensure id is not null
+      name: map['name'] ?? 'Unnamed', // Default to 'Unnamed' if null
       description: map['description'],
-      createdAt: (map['createdAt'] as Timestamp)
-          .toDate(), // Convert Timestamp to DateTime
-      updatedAt: (map['updatedAt'] as Timestamp)
-          .toDate(), // Convert Timestamp to DateTime
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      updatedAt: (map['updatedAt'] as Timestamp).toDate(),
     );
   }
 }
