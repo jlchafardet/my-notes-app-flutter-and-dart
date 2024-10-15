@@ -308,6 +308,7 @@ class _NotesScreenState extends State<NotesScreen> {
           isEditing: true,
           selectedNoteType:
               note.noteType ?? 'Simple', // Provide a default value
+          tags: note.tags, // Pass the tags here
         ),
       ),
     );
