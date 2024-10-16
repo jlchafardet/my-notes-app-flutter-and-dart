@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isAdmin; // Add a parameter to check if the user is an admin
 
-  CustomAppBar(
-      {this.isAdmin = false}); // Constructor with optional isAdmin parameter
+  const CustomAppBar(
+      {super.key,
+      this.isAdmin = false}); // Constructor with optional isAdmin parameter
 
   @override
   Widget build(BuildContext context) {

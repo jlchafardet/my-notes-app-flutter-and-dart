@@ -10,7 +10,7 @@ import 'tag_model.dart'; // Import your Tag model
 import 'custom_app_bar.dart'; // Import the CustomAppBar widget
 import 'menu_drawer.dart'; // Import the MenuDrawer widget
 import 'custom_footer.dart'; // Import the CustomFooter widget
-import 'admin_state.dart'; // Import the AdminState
+//import 'admin_state.dart'; // Import the AdminState
 
 // Define FirebaseOptions
 const FirebaseOptions firebaseOptions = FirebaseOptions(
@@ -31,7 +31,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
 }
 
 class NotesScreen extends StatefulWidget {
-  const NotesScreen({Key? key}) : super(key: key);
+  const NotesScreen({super.key});
 
   @override
   _NotesScreenState createState() => _NotesScreenState();
@@ -190,8 +190,8 @@ class _NotesScreenState extends State<NotesScreen> {
                               icon: const Icon(Icons.delete,
                                   color: Colors.white), // White icon
                               onPressed: () {
-                                print(
-                                    "Delete button pressed for note ID: ${note.id}"); // Debugging line
+                                //print(
+                                //"Delete button pressed for note ID: ${note.id}"); // Debugging line
                                 if (note.id != null) {
                                   // Check if note.id is not null
                                   _confirmDelete(note
@@ -232,8 +232,8 @@ class _NotesScreenState extends State<NotesScreen> {
             ),
           );
         },
-        child: Icon(Icons.add), // "+" icon
         backgroundColor: Colors.blue, // Set the background color
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }
