@@ -1,6 +1,6 @@
 # My Notes App
 
-A Flutter application for managing notes.
+A Flutter application for managing notes. :D
 
 ## Features Implemented
 
