@@ -7,6 +7,8 @@ import 'menu_drawer.dart'; // Import the Menu Drawer
 import 'notetype_model.dart'; // Import the NoteType model
 
 class NoteTypeAdminScreen extends StatefulWidget {
+  const NoteTypeAdminScreen({super.key});
+
   @override
   _NoteTypeAdminScreenState createState() => _NoteTypeAdminScreenState();
 }

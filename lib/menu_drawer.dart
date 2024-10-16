@@ -6,6 +6,8 @@ import 'main.dart'; // Import the MainScreen to access NotesScreen
 import 'about_screen.dart'; // Import the About screen
 
 class MenuDrawer extends StatelessWidget {
+  const MenuDrawer({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
