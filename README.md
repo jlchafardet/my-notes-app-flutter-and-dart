@@ -6,22 +6,58 @@ A Flutter application for managing notes.
 
 ### Step 1: Basic Notes Functionality
 
-1. **Create a Screen to Add a New Note (Title, Content)**:
-   - Users can input a title and content for a new note through a dedicated screen.
+1. **Phase 1: Basic Notes Functionality**
+   - Implement note model and basic structure
+     - Create note_model.dart for the Note class
+     - Set up main.dart with basic app structure and navigation
+   - Create a screen to add a new note
+     Implement note_form_screen.dart for adding and editing notes
+     Add form fields for title and content
+   - Implement a list view to display all notes
+     - Create a notes list view in main.dart
+     - Implement navigation to note_form_screen.dart for editing
+   - Add functionality to edit existing notes
+     - Modify note_form_screen.dart to handle editing
+     - Implement update logic in main.dart
+   - Implement delete functionality for notes
+     - Add delete option in the notes list
+     - Implement delete logic in main.dart
 
-2. **Implement a List View to Display All Notes**:
-   - The app displays a list of all notes that have been created, allowing users to see their notes at a glance.
+2. **Phase 2: Data Persistence with Firebase Firestore**
+   - Set up Firebase project and add dependencies
+   - Configure Firebase in main.dart
+   - Modify note_model.dart for Firestore compatibility
+   - Implement CRUD operations with Firestore in main.dart
+   - Update UI to use Firestore data
+   - Implement offline capabilities and error handling
+   - Test data persistence and synchronization
 
-3. **Add Functionality to Edit Existing Notes**:
-   - Users can tap on a note to edit its title and content, making it easy to update information as needed.
+3. **Phase 3: Types of Notes**
+   - Create notetype_model.dart for NoteType class
+   - Implement notetype_form_screen.dart for adding/editing note types
+   - Create notetype_admin_screen.dart for managing note types
+   - Update note_form_screen.dart to include note type selection
+   - Modify main.dart to incorporate note types in the list view
+   - Implement admin-only access for note type management
+   - Test functionality for different note types
 
-### Step 2: Data Persistence with Firebase Firestore
+4. **Phase 4: Tags**
+   - Create tag_model.dart for Tag class
+   - Implement tag_form_screen.dart for adding/editing tags
+   - Create tag_management_screen.dart for managing tags
+   - Implement tag_list_mainscreen.dart for displaying and filtering by tags
+   - Update note_form_screen.dart to include tag selection
+   - Modify main.dart to incorporate tags in the note list view
+   - Implement tag filtering functionality
+   - Test tagging system and filters
 
-1. **Set Up Firebase**:
-   - The app is integrated with Firebase Firestore for data persistence, allowing users to save, retrieve, edit, and delete notes in real-time.
+     ### Additional Components (Implemented across phases):
 
-2. **CRUD Operations**:
-   - Users can create new notes, read existing notes, update notes, and delete notes, all of which are reflected in Firestore.
+     - Implement admin_state.dart for managing admin privileges
+     - Create custom_app_bar.dart for the app header
+     - Implement menu_drawer.dart for navigation
+     - Create custom_footer.dart for the app footer
+     - Develop about_screen.dart for app information
 
 ## Getting Started
 
