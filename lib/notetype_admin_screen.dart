@@ -7,6 +7,8 @@ import 'menu_drawer.dart'; // Import the Menu Drawer
 import 'notetype_model.dart'; // Import the NoteType model
 
 class NoteTypeAdminScreen extends StatefulWidget {
+  const NoteTypeAdminScreen({super.key});
+
   @override
   _NoteTypeAdminScreenState createState() => _NoteTypeAdminScreenState();
 }
@@ -147,8 +149,8 @@ class _NoteTypeAdminScreenState extends State<NoteTypeAdminScreen> {
             ),
           );
         },
-        child: Icon(Icons.add), // Icon for the FAB
         backgroundColor: Colors.blue, // Background color for the FAB
+        child: Icon(Icons.add), // Icon for the FAB
       ),
     );
   }
