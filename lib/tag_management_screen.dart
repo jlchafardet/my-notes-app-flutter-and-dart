@@ -36,19 +36,51 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
     );
   }
 
-  void _editTag(String tagName) {
-    // Fetch the tag document from Firestore to get the document ID
-    FirebaseFirestore.instance
-        .collection('tags')
-        .where('name', isEqualTo: tagName)
-        .get()
-        .then((snapshot) {
+  // void _editTag(String tagName) {
+  //   // Fetch the tag document from Firestore to get the document ID
+  //   FirebaseFirestore.instance
+  //       .collection('tags')
+  //       .where('name', isEqualTo: tagName)
+  //       .get()
+  //       .then((snapshot) {
+  //     if (snapshot.docs.isNotEmpty) {
+  //       final doc = snapshot.docs.first; // Get the first document
+  //       final tag = Tag(name: tagName); // Create Tag with name
+
+  //       // Navigate to the Tag Form Screen to edit the selected tag
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => TagFormScreen(
+  //             tag: tag, // Pass the Tag object
+  //             onSave: (updatedTag) {
+  //               // Logic to update the tag in Firestore
+  //               doc.reference.update({'name': updatedTag});
+  //             },
+  //           ),
+  //         ),
+  //       );
+  //     }
+  //   });
+  // }
+  void _editTag(String tagName) async { // Make the method async
+    if (!mounted) return; // Add mounted check at the start
+
+    try {
+      // Fetch the tag document from Firestore to get the document ID
+      final snapshot = await FirebaseFirestore.instance
+          .collection('tags')
+          .where('name', isEqualTo: tagName)
+          .get();
+
+      if (!mounted) return; // Add another mounted check after the async operation
+
       if (snapshot.docs.isNotEmpty) {
         final doc = snapshot.docs.first; // Get the first document
         final tag = Tag(name: tagName); // Create Tag with name
 
         // Navigate to the Tag Form Screen to edit the selected tag
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => TagFormScreen(
@@ -61,38 +93,96 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
           ),
         );
       }
-    });
+    } catch (e) {
+      // Handle any errors
+      if (mounted) { // Check if mounted before showing any error dialogs
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error editing tag: $e')),
+        );
+      }
+    }
   }
 
-  void _deleteTag(String tag) async {
-    // Show confirmation dialog
-    bool confirm = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Confirm Deletion'),
-          content: Text('Are you sure you want to delete this tag?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false), // No
-              child: Text('No Cancel'),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.red, // Red background
-                foregroundColor: Colors.white, // White text
-              ),
-              onPressed: () => Navigator.of(context).pop(true), // Yes
-              child: Text('Yes Delete'),
-            ),
-          ],
-        );
-      },
-    );
 
-    if (confirm) {
-      // Proceed with deletion
-      await FirebaseFirestore.instance.collection('tags').doc(tag).delete();
+  // void _deleteTag(String tag) async {
+  //   // Show confirmation dialog
+  //   bool confirm = await showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('Confirm Deletion'),
+  //         content: Text('Are you sure you want to delete this tag?'),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.of(context).pop(false), // No
+  //             child: Text('No Cancel'),
+  //           ),
+  //           TextButton(
+  //             style: TextButton.styleFrom(
+  //               backgroundColor: Colors.red, // Red background
+  //               foregroundColor: Colors.white, // White text
+  //             ),
+  //             onPressed: () => Navigator.of(context).pop(true), // Yes
+  //             child: Text('Yes Delete'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+
+  //   if (confirm) {
+  //     // Proceed with deletion
+  //     await FirebaseFirestore.instance.collection('tags').doc(tag).delete();
+  //   }
+  // }
+
+ void _deleteTag(String tag) async {
+    if (!mounted) return;
+
+    try {
+      // Show confirmation dialog
+      bool? confirm = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Confirm Deletion'),
+            content: Text('Are you sure you want to delete this tag?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('No Cancel'),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text('Yes Delete'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (!mounted) return;
+
+      if (confirm == true) {
+        // Proceed with deletion
+        await FirebaseFirestore.instance.collection('tags').doc(tag).delete();
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Tag deleted successfully')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting tag: $e')),
+        );
+      }
     }
   }
 
