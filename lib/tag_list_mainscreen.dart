@@ -7,7 +7,7 @@ class TagListMainScreen extends StatelessWidget {
   final Function(String) onTagSelected; // Callback for when a tag is selected
   final List<String> activeTags; // List of currently active tags
 
-  TagListMainScreen({required this.onTagSelected, required this.activeTags});
+  const TagListMainScreen({super.key, required this.onTagSelected, required this.activeTags});
 
   @override
   Widget build(BuildContext context) {

@@ -164,8 +164,8 @@ class _TagManagementScreenState extends State<TagManagementScreen> {
           .endDocked, // Position the FAB at the bottom right, docked above the footer
       floatingActionButton: FloatingActionButton(
         onPressed: _addTag,
-        child: Icon(Icons.add), // Icon for the FAB
         backgroundColor: Colors.blue, // Background color for the FAB
+        child: Icon(Icons.add), // Icon for the FAB
       ),
     );
   }

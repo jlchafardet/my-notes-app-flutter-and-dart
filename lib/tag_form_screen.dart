@@ -11,7 +11,7 @@ class TagFormScreen extends StatefulWidget {
   final Tag? tag; // Optional tag for editing
   final Function(Tag) onSave; // Callback for saving the tag
 
-  TagFormScreen({this.tag, required this.onSave});
+  const TagFormScreen({super.key, this.tag, required this.onSave});
 
   @override
   _TagFormScreenState createState() => _TagFormScreenState();
