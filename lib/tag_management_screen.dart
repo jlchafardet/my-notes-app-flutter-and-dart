@@ -9,11 +9,13 @@ import 'custom_footer.dart'; // Import the Custom Footer
 import 'menu_drawer.dart'; // Import the Menu Drawer
 
 class TagManagementScreen extends StatefulWidget {
+  const TagManagementScreen({super.key});
+
   @override
-  _TagManagementScreenState createState() => _TagManagementScreenState();
+  TagManagementScreenState createState() => TagManagementScreenState();
 }
 
-class _TagManagementScreenState extends State<TagManagementScreen> {
+class TagManagementScreenState extends State<TagManagementScreen> {
   List<String> tags = []; // This will hold the list of tags
 
   @override
