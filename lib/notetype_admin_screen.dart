@@ -10,10 +10,10 @@ class NoteTypeAdminScreen extends StatefulWidget {
   const NoteTypeAdminScreen({super.key});
 
   @override
-  _NoteTypeAdminScreenState createState() => _NoteTypeAdminScreenState();
+  NoteTypeAdminScreenState createState() => NoteTypeAdminScreenState();
 }
 
-class _NoteTypeAdminScreenState extends State<NoteTypeAdminScreen> {
+class NoteTypeAdminScreenState extends State<NoteTypeAdminScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

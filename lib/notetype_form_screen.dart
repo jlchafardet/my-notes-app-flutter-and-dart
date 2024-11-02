@@ -12,10 +12,10 @@ class AddNoteTypeScreen extends StatefulWidget {
   const AddNoteTypeScreen({super.key, this.noteType, this.isEditing = false});
 
   @override
-  _AddNoteTypeScreenState createState() => _AddNoteTypeScreenState();
+  AddNoteTypeScreenState createState() => AddNoteTypeScreenState();
 }
 
-class _AddNoteTypeScreenState extends State<AddNoteTypeScreen> {
+class AddNoteTypeScreenState extends State<AddNoteTypeScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 

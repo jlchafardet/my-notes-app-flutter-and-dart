@@ -14,10 +14,10 @@ class TagFormScreen extends StatefulWidget {
   const TagFormScreen({super.key, this.tag, required this.onSave});
 
   @override
-  _TagFormScreenState createState() => _TagFormScreenState();
+  TagFormScreenState createState() => TagFormScreenState();
 }
 
-class _TagFormScreenState extends State<TagFormScreen> {
+class TagFormScreenState extends State<TagFormScreen> {
   final _formKey = GlobalKey<FormState>();
   String _tagName = '';
 
