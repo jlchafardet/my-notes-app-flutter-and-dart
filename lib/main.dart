@@ -10,7 +10,7 @@ import 'tag_model.dart'; // Import your Tag model
 import 'custom_app_bar.dart'; // Import the CustomAppBar widget
 import 'menu_drawer.dart'; // Import the MenuDrawer widget
 import 'custom_footer.dart'; // Import the CustomFooter widget
-import 'admin_state.dart'; // Import the AdminState
+import 'admin_state.dart'; // ignore: unused_import - Import the AdminState 
 
 // Define FirebaseOptions
 const FirebaseOptions firebaseOptions = FirebaseOptions(
@@ -49,10 +49,10 @@ class NotesScreen extends StatefulWidget {
   const NotesScreen({super.key});
 
   @override
-  _NotesScreenState createState() => _NotesScreenState();
+  NotesScreenState createState() => NotesScreenState();
 }
 
-class _NotesScreenState extends State<NotesScreen> {
+class NotesScreenState extends State<NotesScreen> {
   String selectedNoteType = 'All'; // Default value
   List<String> activeTags = [];
 
@@ -306,8 +306,8 @@ class _NotesScreenState extends State<NotesScreen> {
           title: note.title,
           content: note.content,
           isEditing: true,
-          selectedNoteType:
-              note.noteType ?? 'Simple', // Provide a default value
+          selectedNoteType: 
+            note.noteType.isEmpty ? 'Simple' : note.noteType, // Provide a default value
           tags: note.tags, // Pass the tags here
         ),
       ),
